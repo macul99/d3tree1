@@ -28,21 +28,6 @@
 <script src="//d3js.org/d3.v4.min.js"></script>
 <script>
   
-var treeData =
-  {
-    "name": "Top Level",
-    "children": [
-      { 
-    "name": "Level 2: A",
-        "children": [
-          { "name": "Son of A" },
-          { "name": "Daughter of A" }
-        ]
-      },
-      { "name": "Level 2: B" }
-    ]
-  };
-
 // set the dimensions and margins of the diagram
 var margin = {top: 20, right: 90, bottom: 30, left: 90},
     width = 660 - margin.left - margin.right,
@@ -52,58 +37,62 @@ var margin = {top: 20, right: 90, bottom: 30, left: 90},
 var treemap = d3.tree()
     .size([height, width]);
 
-//  assigns the data to a hierarchy using parent-child relationships
-var nodes = d3.hierarchy(treeData, function(d) {return d.children;}); // hierarchy() will assign a range of properties to each node including
-                                                                      // node.data, node.depth, node.height, node.parent, node.children
-                                                                      // We tell the function to use the 'children' elements from 'treeData'
-                                                                      // to generate the properties to the nodes. By default it will use the
-                                                                      // name 'children' if a name is not specified
+// load the external data
+d3.json("treeData.json", function(error, treeData) {
+  if (error) throw error;
 
-// maps the node data to the tree layout
-nodes = treemap(nodes);
+  //  assigns the data to a hierarchy using parent-child relationships
+  var nodes = d3.hierarchy(treeData, function(d) {return d.children;}); // hierarchy() will assign a range of properties to each node including
+                                                                        // node.data, node.depth, node.height, node.parent, node.children
+                                                                        // We tell the function to use the 'children' elements from 'treeData'
+                                                                        // to generate the properties to the nodes. By default it will use the
+                                                                        // name 'children' if a name is not specified
 
-// append the svg obgect to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom),
-    g = svg.append("g")
-      .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+  // maps the node data to the tree layout
+  nodes = treemap(nodes);
 
-// adds the links between the nodes
-var link = g.selectAll(".link")
-    .data( nodes.descendants().slice(1)) //nodes.descendants() return the array of 'descendant' nodes, slice(1) will remove root node since link is a line between child node to its parent
-  .enter().append("path")
-    .attr("class", "link")
-    .attr("d", function(d) {
-       return "M" + d.y + "," + d.x // move the drawing point to specified location using 'M'
-         + "C" + (d.y + d.parent.y) / 2 + "," + d.x // draw a Bezier curve, set the first control point
-         + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x  // set the second control point
-         + " " + d.parent.y + "," + d.parent.x; // set the end point of the Bezier curve
-       });
+  // append the svg obgect to the body of the page
+  // appends a 'group' element to 'svg'
+  // moves the 'group' element to the top left margin
+  var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom),
+      g = svg.append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
 
-// adds each node as a group
-var node = g.selectAll(".node")
-    .data(nodes.descendants())
-  .enter().append("g")
-    .attr("class", function(d) { 
-      return "node" + 
-        (d.children ? " node--internal" : " node--leaf"); })
-    .attr("transform", function(d) { 
-      return "translate(" + d.y + "," + d.x + ")"; });
+  // adds the links between the nodes
+  var link = g.selectAll(".link")
+      .data( nodes.descendants().slice(1)) //nodes.descendants() return the array of 'descendant' nodes, slice(1) will remove root node since link is a line between child node to its parent
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", function(d) {
+         return "M" + d.y + "," + d.x // move the drawing point to specified location using 'M'
+           + "C" + (d.y + d.parent.y) / 2 + "," + d.x // draw a Bezier curve, set the first control point
+           + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x  // set the second control point
+           + " " + d.parent.y + "," + d.parent.x; // set the end point of the Bezier curve
+         });
 
-// adds the circle to the node
-node.append("circle")
-  .attr("r", 10);
+  // adds each node as a group
+  var node = g.selectAll(".node")
+      .data(nodes.descendants())
+    .enter().append("g")
+      .attr("class", function(d) { 
+        return "node" + 
+          (d.children ? " node--internal" : " node--leaf"); })
+      .attr("transform", function(d) { 
+        return "translate(" + d.y + "," + d.x + ")"; });
 
-// adds the text to the node
-node.append("text")
-  .attr("dy", ".35em")
-  .attr("x", function(d) { return d.children ? -13 : 13; })
-  .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-  .text(function(d) { return d.data.name; });
-    
+  // adds the circle to the node
+  node.append("circle")
+    .attr("r", 10);
+
+  // adds the text to the node
+  node.append("text")
+    .attr("dy", ".35em")
+    .attr("x", function(d) { return d.children ? -13 : 13; })
+    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+    .text(function(d) { return d.data.name; });
+});    
 </script>
 </body>
