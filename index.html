@@ -28,20 +28,24 @@
 <script src="//d3js.org/d3.v4.min.js"></script>
 <script>
   
-var treeData =
-  {
-    "name": "Top Level",
-    "children": [
-      { 
-    "name": "Level 2: A",
-        "children": [
-          { "name": "Son of A" },
-          { "name": "Daughter of A" }
-        ]
-      },
-      { "name": "Level 2: B" }
-    ]
-  };
+var flatData = [
+  {"name": "Top Level", "parent": null}, 
+  {"name": "Level 2: A", "parent": "Top Level" },
+  {"name": "Level 2: B", "parent": "Top Level" },
+  {"name": "Son of A", "parent": "Level 2: A" },
+  {"name": "Daughter of A", "parent": "Level 2: A" }
+];
+
+// convert the flat data into a hierarchy 
+var treeData = d3.stratify()
+  .id(function(d) { return d.name; }) // set unique identifier
+  .parentId(function(d) { return d.parent; })
+  (flatData);
+
+// assign the name to each node
+treeData.each(function(d) {
+    d.name = d.id; // to reuse the code below
+  });
 
 // set the dimensions and margins of the diagram
 var margin = {top: 20, right: 90, bottom: 30, left: 90},
