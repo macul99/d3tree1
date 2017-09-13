@@ -11,7 +11,7 @@
 .node text { font: 12px sans-serif; }
 
 .node--internal text {
-  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+  text-shadow: 0 3px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
 }
 
 .link {
@@ -53,7 +53,11 @@ var treemap = d3.tree()
     .size([width, height]);
 
 //  assigns the data to a hierarchy using parent-child relationships
-var nodes = d3.hierarchy(treeData);
+var nodes = d3.hierarchy(treeData, function(d) {return d.children;}); // hierarchy() will assign a range of properties to each node including
+                                                                      // node.data, node.depth, node.height, node.parent, node.children
+                                                                      // We tell the function to use the 'children' elements from 'treeData'
+                                                                      // to generate the properties to the nodes. By default it will use the
+                                                                      // name 'children' if a name is not specified
 
 // maps the node data to the tree layout
 nodes = treemap(nodes);
@@ -70,14 +74,14 @@ var svg = d3.select("body").append("svg")
 
 // adds the links between the nodes
 var link = g.selectAll(".link")
-    .data( nodes.descendants().slice(1))
+    .data( nodes.descendants().slice(1)) //nodes.descendants() return the array of 'descendant' nodes, slice(1) will remove root node since link is a line between child node to its parent
   .enter().append("path")
     .attr("class", "link")
     .attr("d", function(d) {
-       return "M" + d.x + "," + d.y
-         + "C" + d.x + "," + (d.y + d.parent.y) / 2
-         + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
-         + " " + d.parent.x + "," + d.parent.y;
+       return "M" + d.x + "," + d.y // move the drawing point to specified location using 'M'
+         + "C" + d.x + "," + (d.y + d.parent.y) / 2 // draw a Bezier curve, set the first control point
+         + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2 // set the second control point
+         + " " + d.parent.x + "," + d.parent.y; // set the end point of the Bezier curve
        });
 
 // adds each node as a group
