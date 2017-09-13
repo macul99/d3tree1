@@ -116,11 +116,16 @@ var node = g.selectAll(".node")
     .attr("transform", function(d) { 
       return "translate(" + d.y + "," + d.x + ")"; });
 
-// adds the circle to the node
-node.append("circle")
-  .attr("r", function(d) { return d.data.value; })
+// adds symbols as nodes
+node.append("path")
   .style("stroke", function(d) { return d.data.type; })
-  .style("fill", function(d) { return d.data.level; });
+  .style("fill", function(d) { return d.data.level; })
+  .attr("d", d3.symbol()
+     .size(function(d) { return d.data.value * 30; } )
+     .type(function(d) { if
+       (d.data.value >= 9) { return d3.symbolCross; } else if
+       (d.data.value <= 9) { return d3.symbolDiamond;}
+     }));
 
 // adds the text to the node
 node.append("text")
