@@ -34,23 +34,27 @@ var treeData =
     "value": 10,
     "type": "black",
     "level": "red",
+    "icon": "earth.png",
     "children": [
       {
         "name": "Level 2: A",
-        "value": 15,
+        "value": 5,
         "type": "grey",
         "level": "red",
+       "icon": "cart.png",
         "children": [
           {
             "name": "Son of A",
             "value": 5,
             "type": "steelblue",
+            "icon": "lettern.png",
             "level": "orange"
           },
           {
             "name": "Daughter of A",
-            "value": 8,
+            "value": 18,
             "type": "steelblue",
+            "icon": "vlc.png",
             "level": "red"
           }
         ]
@@ -59,6 +63,7 @@ var treeData =
         "name": "Level 2: B",
         "value": 10,
         "type": "grey",
+        "icon": "random.png",
         "level": "green"
       }
     ]
@@ -116,16 +121,13 @@ var node = g.selectAll(".node")
     .attr("transform", function(d) { 
       return "translate(" + d.y + "," + d.x + ")"; });
 
-// adds symbols as nodes
-node.append("path")
-  .style("stroke", function(d) { return d.data.type; })
-  .style("fill", function(d) { return d.data.level; })
-  .attr("d", d3.symbol()
-     .size(function(d) { return d.data.value * 30; } )
-     .type(function(d) { if
-       (d.data.value >= 9) { return d3.symbolCross; } else if
-       (d.data.value <= 9) { return d3.symbolDiamond;}
-     }));
+// adds images as nodes
+node.append("image")
+  .attr("xlink:href", function(d) { return d.data.icon; })
+  .attr("x", "-12px")
+  .attr("y", "-12px")
+  .attr("width", "24px")
+  .attr("height", "24px");
 
 // adds the text to the node
 node.append("text")
